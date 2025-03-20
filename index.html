@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle Prediction</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Hello, I’m the Oracle. How can I help you today?</h1>
+    <p>Enter a future date to predict the Dollar Index and Gold Price:</p>
+    
+    <input type="date" id="date_input" required>
+    <button id="predict_button">Get Prediction</button>
+    
+    <div class="result">
+        <div id="dxy_result"></div>
+        <div id="gold_result"></div>
+    </div>
+
+    <div class="error" id="error_message"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#predict_button').click(function() {
+            const date_input = $('#date_input').val();
+
+            if (!date_input) {
+                $('#error_message').text("Please select a date.");
+                return;
+            }
+
+            $('#error_message').text(""); // Clear any previous error message
+
+            $.ajax({
+                url: '/predict',
+                type: 'POST',
+                data: { date_input: date_input },
+                success: function(response) {
+                    if (response.error) {
+                        $('#error_message').text("Error: " + response.error);
+                    } else {
+                        $('#dxy_result').text("Predicted Dollar Index: " + response.dxy_predicted);
+                        $('#gold_result').text("Predicted Gold Price: " + response.gold_predicted + " USD");
+                    }
+                },
+                error: function() {
+                    $('#error_message').text("An error occurred while fetching the prediction.");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

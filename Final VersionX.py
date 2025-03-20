@@ -2,15 +2,18 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import GRU, Dense
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.layers import GRU, Dense 
+from tensorflow.keras.optimizers import Adam 
 from datetime import datetime
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
+import pickle
+
+
 
 # 1. Load the dataset
-df = pd.read_csv("c:/Users/刘乐天/Gold-Prediction/Gold Prediction/data/merged_data.csv")
+df = pd.read_csv("c:/Users/刘乐天/SNS_Project-main/SNS_Project-main/SNS_Chatbot/Data/merged_data.csv")
 
 # 2. Data preprocessing
 # Convert the date column to datetime format
@@ -39,7 +42,7 @@ y_dxy = df["Close_y"]  # Dollar index column
 dates = df["Date"]  # Save the date column
 
 # Normalize the data for dollar index prediction
-scaler_dxy = MinMaxScaler(feature_range=(0, 1))
+scaler_dxy = MinMaxScaler(feature_range=(0, 10))
 y_dxy_scaled = scaler_dxy.fit_transform(y_dxy.values.reshape(-1, 1))
 
 # Split the data into training and testing sets for dollar index prediction
@@ -131,3 +134,28 @@ gold_pred_scaled = (rf_gold_pred + mlp_gold_pred) / 2
 gold_pred = scaler_gold.inverse_transform(gold_pred_scaled.reshape(-1, 1))
 
 print(f"The predicted future gold price is: {gold_pred[0][0]} USD")
+
+# 保存 RandomForest 模型
+with open('rf_gold_model.pkl', 'wb') as f:
+    pickle.dump(rf_gold_model, f)
+
+# 保存 MLP 模型
+with open('mlp_gold_model.pkl', 'wb') as f:
+    pickle.dump(mlp_gold_model, f)
+
+# 保存 GRU 模型
+gru_dxy_model.save('gru_dxy_model.h5')  # GRU 模型保存为 HDF5 文件
+
+# 在训练时，保存 MinMaxScaler
+scaler_dxy = MinMaxScaler(feature_range=(0, 1))
+y_dxy_scaled = scaler_dxy.fit_transform(y_dxy.values.reshape(-1, 1))
+
+scaler_gold = MinMaxScaler(feature_range=(0, 1))
+y_gold_scaled = scaler_gold.fit_transform(y_gold.values.reshape(-1, 1))
+
+# 保存 MinMaxScaler
+with open('scaler_dxy.pkl', 'wb') as f:
+    pickle.dump(scaler_dxy, f)
+
+with open('scaler_gold.pkl', 'wb') as f:
+    pickle.dump(scaler_gold, f)
